@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,8 +26,11 @@ SECRET_KEY = 'django-insecure--hhzwc4r_^882ovb^9$&3793_b)6pvtwf0iz(s4(a^x_@kuoi9
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = ["127.0.0.1", ".onrender.com"]
+REDIS_URL = os.environ.get(
+    "REDIS_URL",
+    "# Rediss url from upstash",
+)
 
 # Application definition
 
@@ -72,9 +76,18 @@ TEMPLATES = [
 WSGI_APPLICATION = 'myMessenger.wsgi.application'
 ASGI_APPLICATION = 'ChatProject.asgi.application'
 CHANNEL_LAYERS = {
-    "default": {"BACKEND": "channels.layers.InMemoryChannelLayer"},
-}
+    "default": {
+    "BACKEND": "channels_redis.core.RedisChannelLayer",
+    "CONFIG": {
+        "hosts": [REDIS_URL],
+        },
+    }
 
+}
+CSRF_TRUSTED_ORIGINS = [
+    'https://messenger4report.onrender.com',
+    'https://*.onrender.com',
+]
 
 
 # Database
